@@ -21,7 +21,7 @@ Has recibido un **sistema completo de memorización** para tus 416+ preguntas de
   - **Última 1-2 palabras de la respuesta** (esto es lo clave)
   - Botones: Acerté / Fallé / Omitir
 - **Estadísticas en tiempo real:** Total, Correctas, Errores, % Precisión
-- **661 preguntas incluidas** ya cargadas en el sistema
+- **448 preguntas incluidas** ya cargadas en el sistema
 
 **Ejemplo de cómo funciona:**
 ```
@@ -67,7 +67,7 @@ Sistema: Continúa a la siguiente pregunta
 ```
 1. Haz clic en el card "⚡ Memoria Rápida"
 2. Se abrirá memoria-rapida.html
-3. Tienes 661 preguntas cargadas automáticamente
+3. Tienes 448 preguntas cargadas automáticamente
 ```
 
 ### Paso 3: Estudia pregunta por pregunta
@@ -150,7 +150,7 @@ Este es el método científicamente probado más efectivo:
 ### Indicadores de progreso:
 
 ✅ **Semana 1:**
-- Completaste al menos 1 vuelta de 661 preguntas
+- Completaste al menos 1 vuelta de 448 preguntas
 - Precisión: 60-70%
 - Tiempo: 45-60 minutos para 100 preguntas
 
@@ -175,7 +175,7 @@ Este es el método científicamente probado más efectivo:
 
 ### Memoria Rápida
 ```
-✓ 661 preguntas cargadas
+✓ 448 preguntas cargadas
 ✓ Orden aleatorio cada sesión
 ✓ Estadísticas en tiempo real
 ✓ "Ver Respuesta" para revelar última parte
@@ -227,7 +227,7 @@ Si quieres acceder desde cualquier dispositivo:
 **P: ¿Necesito internet para usar esto?**  
 R: NO. Funciona completamente offline. Descargalo y úsalo en tu computadora, teléfono o tablet sin conexión.
 
-**P: ¿Debo memorizar TODAS las 661 preguntas?**  
+**P: ¿Debo memorizar TODAS las 448 preguntas?**  
 R: Sí. Pero usa Spaced Repetition. No todas al mismo tiempo. Repite cada pregunta 2-3 veces en diferentes días.
 
 **P: ¿Cuánto tiempo me toma?**  
