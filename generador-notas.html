@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Notas Comprimidas</title>
+    <style>
+        body {
+            background: #0B0F19;
+            color: #F3F4F6;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #60A5FA;
+            text-align: center;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0 10px;
+        }
+
+        button:hover {
+            background: #2563EB;
+        }
+
+        .notes-container {
+            background: #1a1f38;
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .note-item {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .note-item:last-child {
+            border-bottom: none;
+        }
+
+        .note-q {
+            color: #60A5FA;
+            font-weight: bold;
+        }
+
+        .note-a {
+            color: #10B981;
+            margin-left: 20px;
+        }
+
+        .category {
+            color: #F59E0B;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .stats {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3B82F6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .file-input {
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📋 Generador de Notas Comprimidas</h1>
+    
+    <div class="controls">
+        <input type="file" id="fileInput" class="file-input" accept=".html" />
+        <button onclick="loadAndProcess()">Cargar & Procesar</button>
+        <button onclick="downloadNotes()">⬇️ Descargar TXT</button>
+        <button onclick="copyToClipboard()">📋 Copiar al portapapeles</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="notes-container" id="notesContainer"></div>
+
+    <script>
+        let allNotes = [];
+
+        function loadAndProcess() {
+            const fileInput = document.getElementById('fileInput');
+            
+            // Si hay archivo cargado, leerlo
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    processHTML(e.target.result);
+                };
+                reader.readAsText(file);
+            } else {
+                // Intentar cargar desde index.html en el servidor
+                fetch('index.html')
+                    .then(r => r.text())
+                    .then(html => processHTML(html))
+                    .catch(() => alert('No se puede cargar index.html. Selecciona el archivo manualmente.'));
+            }
+        }
+
+        function processHTML(html) {
+            // Extraer el array de preguntas
+            const jsonMatch = html.match(/const dataSet = (\[[\s\S]*?\]);/);
+            
+            if (!jsonMatch) {
+                alert('No se encontraron preguntas en el HTML');
+                return;
+            }
+
+            let dataSet;
+            try {
+                // Usar Function constructor para eval seguro
+                const func = new Function('return ' + jsonMatch[1]);
+                dataSet = func();
+            } catch (e) {
+                alert('Error parseando preguntas: ' + e.message);
+                return;
+            }
+
+            // Deduplicar
+            const seen = new Set();
+            const unique = [];
+            
+            dataSet.forEach(q => {
+                const key = q.question.toLowerCase().trim();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(q);
+                }
+            });
+
+            // Generar notas comprimidas
+            allNotes = generateCompressedNotes(unique);
+            
+            displayNotes();
+            
+            // Mostrar estadísticas
+            document.getElementById('stats').innerHTML = `
+                <strong>✓ Preguntas cargadas:</strong> ${dataSet.length}<br>
+                <strong>✓ Únicas (sin duplicados):</strong> ${unique.length}<br>
+                <strong>✓ Duplicadas removidas:</strong> ${dataSet.length - unique.length}<br>
+                <strong>✓ Notas generadas:</strong> ${allNotes.length}
+            `;
+        }
+
+        function generateCompressedNotes(questions) {
+            return questions.map(q => {
+                // Limpiar pregunta
+                let question = q.question
+                    .replace(/^\*\*/g, '')
+                    .replace(/\*\*$/g, '')
+                    .trim();
+                
+                // Limitar a primera oración si es muy larga
+                if (question.length > 80) {
+                    const firstSentence = question.split(/[.!?]/)[0].trim();
+                    if (firstSentence.length > 10) {
+                        question = firstSentence.substring(0, 100) + '...';
+                    }
+                }
+
+                // Obtener respuesta
+                let answer = '';
+                if (q.correct_answer) {
+                    answer = q.correct_answer;
+                } else if (q.options && q.correct_idx >= 0 && q.correct_idx < q.options.length) {
+                    answer = q.options[q.correct_idx];
+                }
+
+                // Limitar respuesta a lo esencial
+                if (answer.length > 150) {
+                    answer = answer.substring(0, 147) + '...';
+                }
+
+                // Generar nemotécnia si es posible
+                let shortForm = generateShortForm(question, answer);
+
+                return {
+                    q: question,
+                    a: answer,
+                    category: q.category || 'General',
+                    short: shortForm
+                };
+            });
+        }
+
+        function generateShortForm(q, a) {
+            // Extraer palabras clave
+            const qWords = q.split(/\s+/).filter(w => w.length > 4);
+            const aWords = a.split(/\s+/).filter(w => w.length > 3);
+            
+            const key = (qWords.length > 0 ? qWords[0] : 'Q') + ' → ' + 
+                       (aWords.length > 0 ? aWords[0] : 'A');
+            
+            return key;
+        }
+
+        function displayNotes() {
+            const container = document.getElementById('notesContainer');
+            
+            container.innerHTML = allNotes.map((note, idx) => `
+                <div class="note-item">
+                    <div class="note-q">${idx + 1}. ${note.q}</div>
+                    <div class="note-a">→ ${note.a}</div>
+                    <div class="category">📌 ${note.category} | Nemotecnia: ${note.short}</div>
+                </div>
+            `).join('');
+        }
+
+        function downloadNotes() {
+            if (allNotes.length === 0) {
+                alert('Carga las preguntas primero');
+                return;
+            }
+
+            let content = 'NOTAS COMPRIMIDAS - DISEÑO DE INVESTIGACIÓN\n';
+            content += '='.repeat(60) + '\n\n';
+            
+            // Agrupar por categoría
+            const byCategory = {};
+            allNotes.forEach(n => {
+                if (!byCategory[n.category]) byCategory[n.category] = [];
+                byCategory[n.category].push(n);
+            });
+
+            Object.keys(byCategory).sort().forEach(cat => {
+                content += `\n### ${cat} ###\n`;
+                content += '-'.repeat(40) + '\n';
+                
+                byCategory[cat].forEach((note, idx) => {
+                    content += `\n${idx + 1}. ${note.q}\n`;
+                    content += `   → ${note.a}\n`;
+                    content += `   [${note.short}]\n`;
+                });
+            });
+
+            // Descargar
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'notas-comprimidas.txt';
+            a.click();
+        }
+
+        function copyToClipboard() {
+            if (allNotes.length === 0) {
+                alert('Carga las preguntas primero');
+                return;
+            }
+
+            const text = document.getElementById('notesContainer').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✓ Notas copiadas al portapapeles');
+            });
+        }
+
+        // Intentar cargar automáticamente
+        window.addEventListener('load', () => {
+            document.getElementById('stats').innerHTML = '<em>Carga un archivo HTML o haz clic en "Cargar & Procesar"</em>';
+        });
+    </script>
+</body>
+</html>

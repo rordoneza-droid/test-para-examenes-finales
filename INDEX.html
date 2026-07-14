@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 Centro de Estudio - Diseño de Investigación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0B0F19 0%, #1A1F38 100%);
+            color: #F3F4F6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            background: linear-gradient(to right, #60A5FA, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #9CA3AF;
+            font-size: 1.1rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.3), rgba(59, 130, 246, 0.1));
+            border: 2px solid #3B82F6;
+            border-radius: 16px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 250px;
+        }
+
+        .tool-card:hover {
+            border-color: #60A5FA;
+            box-shadow: 0 10px 30px rgba(96, 165, 250, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .tool-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #60A5FA;
+        }
+
+        .tool-desc {
+            color: #9CA3AF;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .tool-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10B981;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            align-self: flex-start;
+            margin-top: auto;
+            font-weight: 600;
+        }
+
+        .stats-section {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stats-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #60A5FA;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid #3B82F6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #60A5FA;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #9CA3AF;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #0B0F19;
+            border: 2px solid #3B82F6;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #9CA3AF;
+            background: none;
+            border: none;
+        }
+
+        .modal-close:hover {
+            color: #60A5FA;
+        }
+
+        .modal h2 {
+            color: #60A5FA;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .modal p {
+            color: #9CA3AF;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .guide-section {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10B981;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+
+        .guide-section h3 {
+            color: #10B981;
+            margin-bottom: 10px;
+        }
+
+        .guide-section li {
+            margin-left: 20px;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9CA3AF;
+            border-top: 1px solid rgba(96, 165, 250, 0.1);
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Centro de Estudio</h1>
+            <p>Diseño de Investigación - Memorización Rápida</p>
+        </header>
+
+        <div class="stats-section">
+            <div class="stats-title">📊 Estado General</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalQuestions">661</div>
+                    <div class="stat-label">Preguntas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Herramientas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Offline Ready</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">∞</div>
+                    <div class="stat-label">Repeticiones</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Herramienta 1: Memorización Rápida -->
+            <a class="tool-card" onclick="openTool('memoria-rapida')">
+                <div>
+                    <div class="tool-icon">⚡</div>
+                    <div class="tool-title">Memoria Rápida</div>
+                    <div class="tool-desc">
+                        Pregunta → Última parte respuesta. Estudia pregunta por pregunta sin distracciones. Sistema de memorización científica.
+                    </div>
+                </div>
+                <div class="tool-badge">Recomendado</div>
+            </a>
+
+            <!-- Herramienta 2: Simulador Completo -->
+            <a class="tool-card" onclick="openTool('simulador')">
+                <div>
+                    <div class="tool-icon">📝</div>
+                    <div class="tool-title">Simulador Completo</div>
+                    <div class="tool-desc">
+                        Tu simulador original con todas las funciones. 4 opciones de respuesta, estadísticas detalladas y historial.
+                    </div>
+                </div>
+                <div class="tool-badge">Completo</div>
+            </a>
+
+            <!-- Herramienta 3: Generador de Notas -->
+            <a class="tool-card" onclick="openTool('notas')">
+                <div>
+                    <div class="tool-icon">📋</div>
+                    <div class="tool-title">Generador de Notas</div>
+                    <div class="tool-desc">
+                        Crea resúmenes comprimidos de todas tus preguntas. Extrae, deduplica y exporta a texto plano para revisar offline.
+                    </div>
+                </div>
+                <div class="tool-badge">Beta</div>
+            </a>
+        </div>
+
+        <div class="guide-section">
+            <h3>🚀 Guía Rápida de Uso</h3>
+            <ol style="color: #9CA3AF;">
+                <li><strong>Empieza con "Memoria Rápida":</strong> Es el sistema más eficiente para memorizar. Ve pregunta por pregunta.</li>
+                <li><strong>Usa Spaced Repetition:</strong> Repite las mismas preguntas cada 1, 3, 7 y 14 días. Esto fija el aprendizaje.</li>
+                <li><strong>Verifica con Simulador:</strong> Cuando alcances 80%+, prueba el simulador completo para confirmar.</li>
+                <li><strong>Exporta Notas:</strong> Descarga las notas comprimidas para estudiar en papel o en otro dispositivo.</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Modal para Herramientas -->
+    <div id="toolModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Centro de Estudio • Desarrollado para memorización eficiente</p>
+        <p style="font-size: 0.85rem; margin-top: 10px;">Consejo: Los estudios muestran que la repetición espaciada duplica tu retención</p>
+    </footer>
+
+    <script>
+        function openTool(tool) {
+            const modal = document.getElementById('toolModal');
+            const body = document.getElementById('modalBody');
+
+            if (tool === 'memoria-rapida') {
+                body.innerHTML = `
+                    <h2>⚡ Sistema de Memoria Rápida</h2>
+                    <p>Este sistema te muestra:</p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>Pregunta completa</li>
+                        <li>Última parte de la respuesta (1-2 palabras clave)</li>
+                        <li>Contador de progreso</li>
+                    </ul>
+                    <p><strong>Cómo funciona:</strong></p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>Lee la pregunta</li>
+                        <li>Intenta memorizar la respuesta</li>
+                        <li>Haz clic "Ver Respuesta" para revelar</li>
+                        <li>Marca si la recordabas o no</li>
+                        <li>Continúa a la siguiente</li>
+                    </ol>
+                    <p style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <strong>💡 Consejo:</strong> La clave está en las últimas palabras. Son únicas y fáciles de memorizar.
+                    </p>
+                    <button onclick="launchTool('rapida')" style="
+                        width: 100%;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #3B82F6, #1E40AF);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin-top: 20px;
+                    ">Iniciar Memoria Rápida →</button>
+                `;
+            } else if (tool === 'simulador') {
+                body.innerHTML = `
+                    <h2>📝 Simulador Completo</h2>
+                    <p>Tu herramienta de simulación original con todas las características:</p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>4 opciones de respuesta</li>
+                        <li>Feedback inmediato</li>
+                        <li>Explicaciones detalladas</li>
+                        <li>Estadísticas completas</li>
+                        <li>Historial de errores</li>
+                    </ul>
+                    <p><strong>Recomendación:</strong></p>
+                    <p>Usa esto cuando ya hayas memorizado ~80% con Memoria Rápida. Ayuda a confirmar y profundizar el conocimiento.</p>
+                    <button onclick="launchTool('simulador')" style="
+                        width: 100%;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #3B82F6, #1E40AF);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin-top: 20px;
+                    ">Abrir Simulador →</button>
+                `;
+            } else if (tool === 'notas') {
+                body.innerHTML = `
+                    <h2>📋 Generador de Notas</h2>
+                    <p>Crea resúmenes comprimidos de todas tus preguntas en 3 pasos:</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>Carga el archivo simulador-original.html</li>
+                        <li>El sistema automáticamente extrae y deduplica</li>
+                        <li>Descarga las notas en formato .txt</li>
+                    </ol>
+                    <p><strong>Qué obtendrás:</strong></p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>Preguntas sin duplicados</li>
+                        <li>Resúmenes ultra-comprimidos</li>
+                        <li>Nemotecnias para memorizar rápido</li>
+                        <li>Formato de texto para imprimir o llevar</li>
+                    </ul>
+                    <button onclick="launchTool('notas')" style="
+                        width: 100%;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #3B82F6, #1E40AF);
+                        color: white;
+                        border: none;
+                        border-radius: 8px;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        cursor: pointer;
+                        margin-top: 20px;
+                    ">Abrir Generador →</button>
+                `;
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('toolModal').classList.remove('active');
+        }
+
+        function launchTool(tool) {
+            closeModal();
+            if (tool === 'rapida') {
+                window.location.href = 'memoria-rapida.html';
+            } else if (tool === 'simulador') {
+                window.location.href = 'simulador-original.html';
+            } else if (tool === 'notas') {
+                window.location.href = 'generador-notas.html';
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('toolModal');
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        };
+    </script>
+</body>
+</html>
